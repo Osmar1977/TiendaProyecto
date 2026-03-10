@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  autenticacion:
+    build: 
+      context: ./CONTENEDOR 1
+      dockerfile: Dockerfile
+    container_name: restaurante-autenticacion
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - CATEGORIAS_URL=http://categorias:3002
+      - PRODUCTOS_URL=http://productos:3003
+      - PAGOS_URL=http://pagos:3004
+    networks:
+      - red-restaurante
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  categorias:
+    build: 
+      context: ./CONTENEDOR 2
+      dockerfile: Dockerfile
+    container_name: restaurante-categorias
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - NODE_ENV=production
+    networks:
+      - red-restaurante
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  productos:
+    build: 
+      context: ./CONTENEDOR 3
+      dockerfile: Dockerfile
+    container_name: restaurante-productos
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - NODE_ENV=production
+    networks:
+      - red-restaurante
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  pagos:
+    build: 
+      context: ./CONTENEDOR 4
+      dockerfile: Dockerfile
+    container_name: restaurante-pagos
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - NODE_ENV=production
+    networks:
+      - red-restaurante
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  red-restaurante:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
