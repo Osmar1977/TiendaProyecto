@@ -10,12 +10,14 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 // URLs de otros contenedores
 const CATEGORIAS_URL = process.env.CATEGORIAS_URL || 'http://localhost:3002';
@@ -254,8 +256,10 @@ app.get('/', (req, res) => {
 '  <title>Restaurante - Sistema de Pedidos</title>' +
 '  <style>' +
 '    * { margin: 0; padding: 0; box-sizing: border-box; }' +
-'    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }' +
-'    .container { max-width: 1200px; margin: 0 auto; }' +
+'    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; }' +
+'    #videoFondo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }' +
+'    .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: -1; }' +
+'    .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }' +
 '    h1 { color: white; text-align: center; margin-bottom: 30px; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }' +
 '    .auth-box { background: white; border-radius: 15px; padding: 40px; max-width: 400px; margin: 50px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }' +
 '    .auth-box h2 { color: #333; margin-bottom: 20px; text-align: center; }' +
@@ -282,7 +286,8 @@ app.get('/', (req, res) => {
 '    .section-title { color: white; margin-bottom: 20px; font-size: 1.8em; }' +
 '    .back-btn { padding: 10px 25px; background: white; color: #667eea; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 20px; }' +
 '    .productos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }' +
-'    .producto-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }' +
+'    .producto-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }' +
+'    .producto-imagen { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }' +
 '    .producto-nombre { font-size: 1.3em; color: #333; font-weight: 600; margin-bottom: 10px; }' +
 '    .producto-desc { color: #777; margin-bottom: 10px; font-size: 0.9em; }' +
 '    .producto-precio { color: #667eea; font-size: 1.4em; font-weight: 700; margin-bottom: 15px; }' +
@@ -314,8 +319,16 @@ app.get('/', (req, res) => {
 '  </style>' +
 '</head>' +
 '<body>' +
+'  <video autoplay muted loop id="videoFondo">' +
+'    <source src="/videos/fondo.mp4" type="video/mp4">' +
+'  </video>' +
+'  <audio autoplay loop id="audioFondo">' +
+'    <source src="/videos/videoplayback.m4a" type="audio/mp4">' +
+'  </audio>' +
+'  <div class="video-overlay"></div>' +
+'  <button id="audioBtn" onclick="toggleAudio()" style="position:fixed;top:20px;right:20px;z-index:1000;padding:10px 20px;background:#fff;border-radius:8px;cursor:pointer;">🔊</button>' +
 '  <div class="container">' +
-'    <h1>🍔 Restaurant Osmar 🍺</h1>' +
+'    <h1>🍔Restaurante Osmar FRV🍺</h1>' +
 '    <div id="authSection">' +
 '      <div class="auth-box">' +
 '        <h2 id="authTitle">Iniciar Sesión</h2>' +
@@ -352,6 +365,7 @@ app.get('/', (req, res) => {
 '        <div class="productos-grid" id="productosGrid"></div>' +
 '      </div>' +
 '      <div class="carrito-section hidden" id="carritoSection">' +
+'        <button class="back-btn" onclick="showCategorias()">← Volver</button>' +
 '        <div class="carrito-header">' +
 '          <h2>🛒 Tu Carrito</h2>' +
 '          <button class="vaciar-btn" onclick="vaciarCarrito()">Vaciar Carrito</button>' +
@@ -361,6 +375,7 @@ app.get('/', (req, res) => {
 '        <button class="btn" style="margin-top: 20px;" onclick="showPago()">Proceder al Pago →</button>' +
 '      </div>' +
 '      <div class="pago-section hidden" id="pagoSection">' +
+'        <button class="back-btn" onclick="showCarritoFromPago()">← Volver al Carrito</button>' +
 '        <h2>💳 Método de Pago</h2>' +
 '        <div class="metodo-pago" id="metodosPago"></div>' +
 '        <button class="pagar-btn" onclick="procesarPago()">PAGAR AHORA</button>' +
@@ -378,6 +393,14 @@ app.get('/', (req, res) => {
 '    let currentCategoria = null;' +
 '    let selectedMetodoPago = "efectivo";' +
 '    let isLoginMode = true;' +
+'    let audioPlaying = true;' +
+'    function toggleAudio() {' +
+'      var audio = document.getElementById("audioFondo");' +
+'      var btn = document.getElementById("audioBtn");' +
+'      if (audioPlaying) { audio.pause(); btn.textContent = "🔇"; }' +
+'      else { audio.play(); btn.textContent = "🔊"; }' +
+'      audioPlaying = !audioPlaying;' +
+'    }' +
 '    document.getElementById("toggleAuth").addEventListener("click", function() {' +
 '      isLoginMode = !isLoginMode;' +
 '      document.getElementById("authTitle").textContent = isLoginMode ? "Iniciar Sesión" : "Registrarse";' +
@@ -444,7 +467,9 @@ app.get('/', (req, res) => {
 '      var html = "";' +
 '      for (var i = 0; i < data.data.length; i++) {' +
 '        var prod = data.data[i];' +
+'        var imagenUrl = prod.imagen || "https://via.placeholder.com/300x200?text=Imagen+no+disponible";' +
 '        html += "<div class=\\"producto-card\\">";' +
+'        html += "<img class=\\"producto-imagen\\" src=\\"" + imagenUrl + "\\" alt=\\"" + prod.nombre + "\\">";' +
 '        html += "<div class=\\"producto-nombre\\">" + prod.nombre + "</div>";' +
 '        html += "<div class=\\"producto-desc\\">" + prod.descripcion + "</div>";' +
 '        html += "<div class=\\"producto-precio\\">$" + prod.precio.toLocaleString() + "</div>";' +
@@ -519,6 +544,10 @@ app.get('/', (req, res) => {
 '      document.getElementById("carritoSection").classList.add("hidden");' +
 '      document.getElementById("pagoSection").classList.remove("hidden");' +
 '      loadMetodosPago();' +
+'    }' +
+'    function showCarritoFromPago() {' +
+'      document.getElementById("pagoSection").classList.add("hidden");' +
+'      document.getElementById("carritoSection").classList.remove("hidden");' +
 '    }' +
 '    async function loadMetodosPago() {' +
 '      var res = await fetch("/api/pagos/metodos");' +

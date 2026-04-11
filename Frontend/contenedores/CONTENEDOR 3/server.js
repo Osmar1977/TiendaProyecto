@@ -29,43 +29,43 @@ app.use(bodyParser.json());
 const productos = {
   // ---------- BEBIDAS ----------
   bebidas: [
-    { id: 1, nombre: 'Gaseosa Coca cola', precio: 2500, descripcion: 'Refresco de cola 350ml', disponible: true },
-    { id: 2, nombre: 'Jugo Hit', precio: 2500, descripcion: 'Refresco de naranja 350ml', disponible: true },
-    { id: 3, nombre: 'Agua Mineral', precio: 2000, descripcion: 'Agua sin gas 500ml', disponible: true },
-    { id: 4, nombre: 'Jugo Natural', precio: 3500, descripcion: 'Jugo de fruta naturales', disponible: true },
-    { id: 5, nombre: 'Cerveza', precio: 4500, descripcion: 'Cerveza nacional', disponible: true },
-    { id: 6, nombre: 'Limonada', precio: 3000, descripcion: 'Limonada natural', disponible: true }
+    { id: 1, nombre: 'Gaseosa Coca cola', precio: 2500, descripcion: 'Refresco de cola 350ml', disponible: true, imagen: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300&h=300&fit=crop' },
+    { id: 2, nombre: 'Cafe', precio: 2500, descripcion: 'Cafe caliente', disponible: true, imagen: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&h=300&fit=crop' },
+    { id: 3, nombre: 'Agua Mineral', precio: 2000, descripcion: 'Agua sin gas 500ml', disponible: true, imagen: 'https://images.unsplash.com/photo-1559839914-17aae19cec71?w=300&h=300&fit=crop' },
+    { id: 4, nombre: 'Jugo Natural', precio: 3500, descripcion: 'Jugo de fruta naturales', disponible: true, imagen: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=300&h=300&fit=crop' },
+    { id: 5, nombre: 'Cerveza', precio: 4500, descripcion: 'Cerveza nacional', disponible: true, imagen: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=300&h=300&fit=crop' },
+    { id: 6, nombre: 'Limonada', precio: 3000, descripcion: 'Limonada natural', disponible: true, imagen: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=300&h=300&fit=crop' }
   ],
   
   // ---------- ALMUERZOS ----------
   almuerzos: [
-    { id: 7, nombre: 'Almuerzo Ejecutivo', precio: 15000, descripcion: 'Pollo, arroz, ensalada, sopa', disponible: true },
-    { id: 8, nombre: 'Almuerzo Casero', precio: 12000, descripcion: 'Carne, frijoles, plátano, arroz', disponible: true },
-    { id: 9, nombre: 'Almuerzo Vegetariano', precio: 11000, descripcion: 'Legumbres, arroz, ensalada', disponible: true },
-    { id: 10, nombre: 'Bandeja Paisa', precio: 18000, descripcion: 'Frijoles, arroz, carne, chicharrón, huevo', disponible: true },
-    { id: 11, nombre: 'Lentejas', precio: 14000, descripcion: 'Lentejas con arroz y carne', disponible: true },
-    { id: 12, nombre: 'Spaghetti', precio: 13000, descripcion: 'Spaghetti con salsa de tomate', disponible: true }
+    { id: 7, nombre: 'Almuerzo Ejecutivo', precio: 20000, descripcion: 'Arroz, carne, papa, frijoles y sopa', disponible: true, imagen: 'https://www.colombianisimo.digitalfutureagency.com/images/menu/ejecutivo/ejecutivo-4.png' },
+    { id: 8, nombre: 'Sancocho', precio: 15000, descripcion: 'Sancocho', disponible: true, imagen: 'https://www.elespectador.com/resizer/v2/BDCW5WGPNFDU3JQCFJV4CSFVRA.jpg?auth=6f2e83f4bfa4f466b3c28bcf642b27c9e7481166de4ce700ecb0e1b4c90f4fd4&width=920&height=613&smart=true&quality=60' },
+    { id: 9, nombre: 'Almuerzo Vegetariano', precio: 11000, descripcion: 'vegetales, arroz y huevo', disponible: true, imagen: 'https://image.freepik.com/foto-gratis/almuerzo-vegetariano-verde-saludable-tazon-buda-huevos-arroz-tomate-aguacate-queso-azul-mesa_2829-18818.jpg' },
+    { id: 10, nombre: 'Bandeja Paisa', precio: 18000, descripcion: 'Frijoles, arroz, carne, chicharrón, huevo, tajada, arepa, aguacate y guiso', disponible: true, imagen: 'https://buengusto.co/wp-content/uploads/2019/08/co_mde_bandeja_paisa-1920x1080.jpg' },
+    { id: 11, nombre: 'Lentejas', precio: 14000, descripcion: 'Lentejas con arroz, huevo y aguacate', disponible: true, imagen: 'https://i.pinimg.com/originals/33/f3/61/33f361c1820fdf5b680c12ac2b9a23ef.jpg' },
+    { id: 12, nombre: 'Spaghetti', precio: 15000, descripcion: 'Spaghetti bolognese', disponible: true, imagen: 'https://asset.jamieoliver.com/images/cq7w2e71/production/123c983a6327bf692877ddbfdcc6910e6b57049a-958x1280.jpg/143846725?rect=0,2,958,1277&w=700&h=933&fm=webp&q=80&fit=crop&auto=format' }
   ],
   
   // ---------- COMIDA CHATARRA ----------
   'comida-chatarra': [
-    { id: 13, nombre: 'Hamburguesa Simple', precio: 8000, descripcion: 'Pan, carne, queso, lechuga, salsas', disponible: true },
-    { id: 14, nombre: 'Hamburguesa Doble', precio: 12000, descripcion: 'Pan, dos carnes, doble queso, tocineta, tomate, lechuga, salsas', disponible: true },
-    { id: 15, nombre: 'Pizza Personal', precio: 10000, descripcion: 'Pizza de queso 8 pulgadas', disponible: true },
-    { id: 16, nombre: 'Hot Dog', precio: 6000, descripcion: 'Pan, salchicha, toppings', disponible: true },
-    { id: 17, nombre: 'Salchipapa', precio: 9000, descripcion: 'Papas fritas con salchicha', disponible: true },
-    { id: 18, nombre: 'Arepa con Queso', precio: 5000, descripcion: 'Arepa rellena de queso', disponible: true },
-    { id: 19, nombre: 'Patacón', precio: 7000, descripcion: 'Patacón con toppings', disponible: true }
+    { id: 13, nombre: 'Hamburguesa Simple', precio: 12000, descripcion: 'Pan, carne, queso, lechuga, salsas', disponible: true, imagen: 'https://statics.diariomendoza.com.ar/2023/12/658b398ac548e.jpg' },
+    { id: 14, nombre: 'Hamburguesa Doble', precio: 20000, descripcion: 'Pan, dos carnes, doble queso, tocineta, tomate, lechuga, salsas', disponible: true, imagen: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=300&h=300&fit=crop' },
+    { id: 15, nombre: 'Pizza Personal', precio: 10000, descripcion: 'Pizza de queso 8 pulgadas', disponible: true, imagen: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&h=300&fit=crop' },
+    { id: 16, nombre: 'Hot Dog', precio: 9500, descripcion: 'Pan, salchicha, toppings', disponible: true, imagen: 'https://www.thecookierookie.com/wp-content/uploads/2023/05/featured-grilled-hotdogs-recipe.jpg' },
+    { id: 17, nombre: 'Salchipapa', precio: 11500, descripcion: 'Papas fritas con salchicha y mucho más', disponible: true, imagen: 'https://i.ytimg.com/vi/I2_NmNHa-2M/maxresdefault.jpg' },
+    { id: 18, nombre: 'Arepa con Queso', precio: 7000, descripcion: 'Arepa rellena de queso', disponible: true, imagen: 'https://www.lemonblossoms.com/wp-content/uploads/2023/02/Arepas-con-Queso-Recipe-S4.jpg' },
+    { id: 19, nombre: 'Patacón', precio: 7000, descripcion: 'Patacón con salsas', disponible: true, imagen: 'https://victoria.com.co/cdn/shop/articles/Patacones-con-carne-de-hierro-fundido.png' }
   ],
   
   // ---------- MECATO ----------
   mecato: [
-    { id: 20, nombre: 'Papas Fritas', precio: 4000, descripcion: 'Papas fritas medianas', disponible: true },
-    { id: 21, nombre: 'Nachos', precio: 6000, descripcion: 'Nachos con queso', disponible: true },
-    { id: 22, nombre: 'Galletas', precio: 2500, descripcion: 'Paquete de galletas', disponible: true },
-    { id: 23, nombre: 'Churrería', precio: 5000, descripcion: '6 churros con azúcar', disponible: true },
-    { id: 24, nombre: 'Popcorn', precio: 4500, descripcion: 'Palomitas de maíz', disponible: true },
-    { id: 25, nombre: 'Empanada', precio: 3000, descripcion: 'Empanada de carne o pollo', disponible: true }
+    { id: 20, nombre: 'Papas Fritas', precio: 4500, descripcion: 'Papas fritas medianas', disponible: true, imagen: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=300&fit=crop' },
+    { id: 21, nombre: 'Nachos', precio: 6000, descripcion: 'Nachos con queso y mas', disponible: true, imagen: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=300&h=300&fit=crop' },
+    { id: 22, nombre: 'Galletas', precio: 3000, descripcion: 'Paquete de galletas de muchos sabores', disponible: true, imagen: 'https://w7.pngwing.com/pngs/550/874/png-transparent-biscuits-lebkuchen-macaroon-chocolate-food-gift-baskets-oatmeal-raisin-cookies-food-gluten-biscuits.png' },
+    { id: 23, nombre: 'Churrería', precio: 5000, descripcion: '6 churros con azúcar', disponible: true, imagen: 'https://img.freepik.com/psd-premium/churros-aislados-sobre-fondo-transparente-png-psd_888962-429.jpg' },
+    { id: 24, nombre: 'Popcorn', precio: 5500, descripcion: 'Palomitas de maíz', disponible: true, imagen: 'https://img.freepik.com/fotos-premium/palomitas-maiz-caramelo-miel-sobre-fondo-blanco_51524-31837.jpg' },
+    { id: 25, nombre: 'Empanada', precio: 3500, descripcion: 'Empanada de carne o pollo', disponible: true, imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6MTS9nwQeRBI7fvNeWbVMsFAigBXI9kHBAw&s' }
   ]
 };
 
