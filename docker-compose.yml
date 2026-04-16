@@ -4,13 +4,11 @@ services:
 
   autenticacion:
     build:
-      context: ./Frontend/contenedores/CONTENEDOR 1
+      context: ./Frontend/contenedores/01-Usuarios
       dockerfile: Dockerfile
     container_name: restaurante-autenticacion
     ports:
       - "3001:3001"
-    volumes:
-      - ./Frontend/contenedores/CONTENEDOR 1/videos:/app/videos
     environment:
       - PORT=3001
       - NODE_ENV=production
@@ -28,7 +26,7 @@ services:
 
   categorias:
     build:
-      context: ./Frontend/contenedores/CONTENEDOR 2
+      context: ./Frontend/contenedores/02-Categoría
       dockerfile: Dockerfile
     container_name: restaurante-categorias
     ports:
@@ -47,7 +45,7 @@ services:
 
   productos:
     build:
-      context: ./Frontend/contenedores/CONTENEDOR 3
+      context: ./Frontend/contenedores/03-Productos
       dockerfile: Dockerfile
     container_name: restaurante-productos
     ports:
@@ -66,7 +64,7 @@ services:
 
   pagos-original:
     build:
-      context: ./Frontend/contenedores/CONTENEDOR 4
+      context: ./Frontend/contenedores/04-Pagos
       dockerfile: Dockerfile
     container_name: restaurante-pagos-original
     ports:

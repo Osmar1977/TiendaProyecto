@@ -6,7 +6,6 @@ COPY package.json ./
 RUN npm install
 
 COPY server.js ./
-COPY videos/ ./videos/
 
 EXPOSE 3001
 
