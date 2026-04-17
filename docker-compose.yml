@@ -15,6 +15,9 @@ services:
       - CATEGORIAS_URL=http://categorias:3002
       - PRODUCTOS_URL=http://productos:3003
       - PAGOS_URL=http://pagos-original:3004
+      - CARRITO_URL=http://carrito:3006
+      - USUARIOS_URL=http://usuarios:3005
+      - METODOS_URL=http://metodos-pago:3008
     networks:
       - red-restaurante
     restart: unless-stopped
@@ -91,7 +94,7 @@ services:
     ports:
       - "3005:3005"
     environment:
-      - PORT=3005
+      - PUERTO=3005
     volumes:
       - ./Backend/data:/data
     networks:
@@ -111,7 +114,7 @@ services:
     ports:
       - "3006:3006"
     environment:
-      - PORT=3006
+      - PUERTO=3006
     volumes:
       - ./Backend/data:/data
     networks:
@@ -131,7 +134,7 @@ services:
     ports:
       - "3007:3007"
     environment:
-      - PORT=3007
+      - PUERTO=3007
     volumes:
       - ./Backend/data:/data
     networks:
@@ -151,7 +154,7 @@ services:
     ports:
       - "3008:3008"
     environment:
-      - PORT=3008
+      - PUERTO=3008
     volumes:
       - ./Backend/data:/data
     networks:

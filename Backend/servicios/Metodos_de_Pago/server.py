@@ -16,6 +16,7 @@ METODOS_DISPONIBLES = [
 
 # Crear tabla
 def iniciar_base_datos():
+    os.makedirs(os.path.dirname(BASE_DATOS), exist_ok=True)
     conexion = sqlite3.connect(BASE_DATOS)
     conexion.execute('''
         CREATE TABLE IF NOT EXISTS transacciones (
@@ -33,7 +34,8 @@ def iniciar_base_datos():
 
 # Abrir base de datos
 def abrir():
-    conexion = sqlite3.connect(BASE_DATOS)
+    os.makedirs(os.path.dirname(BASE_DATOS), exist_ok=True)
+    conexion = sqlite3.connect(BASE_DATOS, check_same_thread=False)
     conexion.row_factory = sqlite3.Row
     return conexion
 

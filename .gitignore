@@ -1,0 +1,27 @@
+# Bases de datos SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Directorio de datos del backend
+Backend/data/
+
+# Dependencias Node.js
+node_modules/
+
+# Variables de entorno
+.env
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# VSCode
+.vscode/
