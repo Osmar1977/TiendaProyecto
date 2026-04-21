@@ -20,9 +20,12 @@ app.use(bodyParser.json());
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 // URLs de otros contenedores
-const CATEGORIAS_URL = process.env.CATEGORIAS_URL || 'http://localhost:3002';
-const PRODUCTOS_URL = process.env.PRODUCTOS_URL || 'http://localhost:3003';
-const PAGOS_URL = process.env.PAGOS_URL || 'http://localhost:3004';
+const CATEGORIAS_URL = process.env.CATEGORIAS_URL || 'http://categorias:3002';
+const PRODUCTOS_URL = process.env.PRODUCTOS_URL || 'http://productos:3003';
+const PAGOS_URL = process.env.PAGOS_URL || 'http://pagos-original:3004';
+const CARRITO_URL = process.env.CARRITO_URL || 'http://carrito:3006';
+const USUARIOS_URL = process.env.USUARIOS_URL || 'http://usuarios:3005';
+const METODOS_URL = process.env.METODOS_URL || 'http://metodos-pago:3008';
 
 // Base de datos simulada de usuarios
 const usuarios = [
@@ -59,39 +62,23 @@ function validarToken(req, res, next) {
 // ==================== API DE AUTENTICACIÓN ====================
 
 // POST /api/login - Iniciar sesión
-app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
-  
-  if (!username || !password) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Usuario y contraseña son requeridos' 
+app.post('/api/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const response = await fetch(USUARIOS_URL + '/api/usuarios/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuario: username, contrasena: password })
     });
-  }
-  
-  const usuario = usuarios.find(u => u.username === username && u.password === password);
-  
-  if (usuario) {
-    const token = 'token_' + Date.now() + '_' + usuario.id;
-    sesiones.set(token, usuario);
-    
-    res.json({
-      success: true,
-      message: 'Login exitoso',
-      data: {
-        token,
-        usuario: {
-          id: usuario.id,
-          username: usuario.username,
-          rol: usuario.rol
-        }
-      }
-    });
-  } else {
-    res.status(401).json({
-      success: false,
-      message: 'Credenciales inválidas'
-    });
+    const data = await response.json();
+    if (data.exito) {
+      const token = 'token_' + Date.now() + '_' + data.datos.id;
+      res.json({ success: true, message: data.mensaje, data: { token, usuario: { id: data.datos.id, username: data.datos.usuario, rol: 'cliente' } } });
+    } else {
+      res.status(401).json({ success: false, message: data.mensaje });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error de conexión con usuarios' });
   }
 });
 
@@ -116,43 +103,23 @@ app.get('/api/validar', validarToken, (req, res) => {
 });
 
 // POST /api/register - Registrar usuario
-app.post('/api/register', (req, res) => {
-  const { username, password } = req.body;
-  
-  if (!username || !password) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Usuario y contraseña son requeridos' 
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const response = await fetch(USUARIOS_URL + '/api/usuarios/registro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuario: username, contrasena: password })
     });
-  }
-  
-  const usuarioExistente = usuarios.find(u => u.username === username);
-  
-  if (usuarioExistente) {
-    return res.status(409).json({ 
-      success: false, 
-      message: 'El usuario ya existe' 
-    });
-  }
-  
-  const nuevoUsuario = {
-    id: usuarios.length + 1,
-    username,
-    password,
-    rol: 'cliente'
-  };
-  
-  usuarios.push(nuevoUsuario);
-  
-  res.status(201).json({
-    success: true,
-    message: 'Usuario registrado correctamente',
-    data: {
-      id: nuevoUsuario.id,
-      username: nuevoUsuario.username,
-      rol: nuevoUsuario.rol
+    const data = await response.json();
+    if (data.exito) {
+      res.status(201).json({ success: true, message: data.mensaje, data: { id: data.datos.id, username: data.datos.usuario, rol: 'cliente' } });
+    } else {
+      res.status(409).json({ success: false, message: data.mensaje });
     }
-  });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error de conexión con usuarios' });
+  }
 });
 
 // ==================== PROXY A OTROS CONTENEDORES ====================
@@ -182,65 +149,86 @@ app.get('/api/productos/:categoria', async (req, res) => {
 // POST /api/carrito/agregar - Agregar al carrito
 app.post('/api/carrito/agregar', async (req, res) => {
   try {
-    const response = await fetch(PRODUCTOS_URL + '/api/carrito/agregar', {
+    const response = await fetch(CARRITO_URL + '/api/carrito/agregar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
     });
     const data = await response.json();
+    if (typeof data.exito !== 'undefined') {
+      data.success = data.exito;
+      data.message = data.mensaje || data.message;
+    }
     res.json(data);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error de conexión' });
+    res.status(500).json({ success: false, message: 'Error de conexión con carrito' });
   }
 });
 
 // GET /api/carrito/:sessionId - Ver carrito
 app.get('/api/carrito/:sessionId', async (req, res) => {
   try {
-    const response = await fetch(PRODUCTOS_URL + '/api/carrito/' + req.params.sessionId);
+    const response = await fetch(CARRITO_URL + '/api/carrito/' + req.params.sessionId);
     const data = await response.json();
+    // Normalizar respuesta: el frontend espera data.items, el backend devuelve data.productos
+    if (data.datos) {
+      data.data = {
+        items: data.datos.productos || [],
+        cantidadTotal: data.datos.cantidad_total || 0,
+        total: data.datos.total || 0
+      };
+    }
     res.json(data);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error de conexión' });
+    res.status(500).json({ success: false, message: 'Error de conexión con carrito' });
   }
 });
 
 // DELETE /api/carrito/:sessionId - Vaciar carrito
 app.delete('/api/carrito/:sessionId', async (req, res) => {
   try {
-    const response = await fetch(PRODUCTOS_URL + '/api/carrito/' + req.params.sessionId, {
+    const response = await fetch(CARRITO_URL + '/api/carrito/' + req.params.sessionId, {
       method: 'DELETE'
     });
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error de conexión' });
+    res.status(500).json({ success: false, message: 'Error de conexión con carrito' });
   }
 });
 
 // POST /api/pagos/procesar - Procesar pago
 app.post('/api/pagos/procesar', async (req, res) => {
   try {
-    const response = await fetch(PAGOS_URL + '/api/pagos/procesar', {
+    const response = await fetch(METODOS_URL + '/api/pagos/procesar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
     });
     const data = await response.json();
+    // Normalizar respuesta
+    if (data.datos) {
+      data.data = data.datos;
+      data.success = data.exito;
+    }
     res.json(data);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error de conexión' });
+    res.status(500).json({ success: false, message: 'Error de conexión con pagos' });
   }
 });
 
 // GET /api/pagos/metodos - Obtener métodos de pago
 app.get('/api/pagos/metodos', async (req, res) => {
   try {
-    const response = await fetch(PAGOS_URL + '/api/pagos/metodos');
+    const response = await fetch(METODOS_URL + '/api/pagos/metodos');
     const data = await response.json();
+    if (data.datos) {
+      data.data = data.datos;
+      data.success = data.exito;
+    }
     res.json(data);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error de conexión' });
+    res.status(500).json({ success: false, message: 'Error de conexión con pagos' });
   }
 });
 
@@ -476,22 +464,31 @@ app.get('/', (req, res) => {
 '        body: JSON.stringify({' +
 '          sessionId: sessionId,' +
 '          productoId: productoId,' +
+'          nombre: nombre,' +
+'          precio: precio,' +
 '          categoria: currentCategoria,' +
 '          cantidad: 1' +
 '        })' +
 '      });' +
 '      var data = await res.json();' +
-'      if (data.success) {' +
+'      if (data.success || data.exito) {' +
 '        showNotification("Producto agregado al carrito", "success");' +
-'        loadCarrito();' +
+'        await loadCarrito();' +
 '      }' +
 '    }' +
 '    async function loadCarrito() {' +
 '      var res = await fetch("/api/carrito/" + sessionId);' +
 '      var data = await res.json();' +
-'      var items = data.data.items || [];' +
-'      document.getElementById("carritoCount").textContent = data.data.cantidadTotal || 0;' +
-'      document.getElementById("carritoTotal").textContent = (data.data.total || 0).toLocaleString();' +
+'      if (!data.data && data.datos) {' +
+'        data.data = {' +
+'          items: data.datos.productos || [],' +
+'          cantidadTotal: data.datos.cantidad_total || 0,' +
+'          total: data.datos.total || 0' +
+'        };' +
+'      }' +
+'      var items = (data.data && data.data.items) || [];' +
+'      document.getElementById("carritoCount").textContent = (data.data && data.data.cantidadTotal) || 0;' +
+'      document.getElementById("carritoTotal").textContent = ((data.data && data.data.total) || 0).toLocaleString();' +
 '      var container = document.getElementById("carritoItems");' +
 '      if (items.length === 0) {' +
 '        container.innerHTML = "<p style=\\"text-align: center; color: #777; padding: 20px;\\">Tu carrito está vacío</p>";' +

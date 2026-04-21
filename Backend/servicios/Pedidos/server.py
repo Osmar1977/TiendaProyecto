@@ -7,6 +7,7 @@ PUERTO     = int(os.environ.get('PUERTO', 3007))
 
 # Crear tablas
 def iniciar_base_datos():
+    os.makedirs(os.path.dirname(BASE_DATOS), exist_ok=True)
     conexion = sqlite3.connect(BASE_DATOS)
     conexion.executescript('''
         CREATE TABLE IF NOT EXISTS pedidos (
@@ -32,7 +33,8 @@ def iniciar_base_datos():
 
 # Abrir base de datos
 def abrir():
-    conexion = sqlite3.connect(BASE_DATOS)
+    os.makedirs(os.path.dirname(BASE_DATOS), exist_ok=True)
+    conexion = sqlite3.connect(BASE_DATOS, check_same_thread=False)
     conexion.row_factory = sqlite3.Row
     return conexion
 
