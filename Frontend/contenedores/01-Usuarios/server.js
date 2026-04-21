@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 // URLs de otros contenedores
 const CATEGORIAS_URL = process.env.CATEGORIAS_URL || 'http://localhost:3002';
@@ -255,7 +256,9 @@ app.get('/', (req, res) => {
 '  <title>Restaurante - Sistema de Pedidos</title>' +
 '  <style>' +
 '    * { margin: 0; padding: 0; box-sizing: border-box; }' +
-'    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; background: linear-gradient(180deg, #28a745 0%, #20c997 50%, #ffffff 100%); }' +
+'    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; }' +
+'    .video-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }' +
+'    .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 0; }' +
 '    .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }' +
 '    h1 { color: white; text-align: center; margin-bottom: 30px; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }' +
 '    .auth-box { background: linear-gradient(180deg, #ffffff 0%, #e8f5e9 100%); border-radius: 15px; padding: 40px; max-width: 400px; margin: 50px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }' +
@@ -592,6 +595,10 @@ app.get('/', (req, res) => {
 '      setTimeout(function() { notif.remove(); }, 3000);' +
 '    }' +
 '  </script>' +
+'  <div class="video-overlay"></div>' +
+'  <video autoplay muted loop class="video-background">' +
+'    <source src="/videos/welcome-video.mp4" type="video/mp4">' +
+'  </video>' +
 '</body>' +
 '</html>';
   
